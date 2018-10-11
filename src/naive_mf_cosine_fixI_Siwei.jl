@@ -2,7 +2,7 @@
 #@pyimport matplotlib.pyplot as plt
 
 # gain function
-gain(x) = sqrt(max(0,x))
+gain(x) = sqrt.(max(0,x))
 
 #function weights(N,L,A,B,a,b)
 function weights(N,L,A,a,b)
@@ -52,7 +52,7 @@ function naive_mf(N,L,I0,u,scale,shift,total,h,A,a,b)
 #	b = 10.0/L
         a/=L
         b/=L
-        w = shift/L+scale* weights(N,L,A,a,b)
+        w = shift/L .+ scale* weights(N,L,A,a,b)
 #        w = scale*weights(N,L,A,a,b)
 
         # set input
@@ -63,7 +63,7 @@ function naive_mf(N,L,I0,u,scale,shift,total,h,A,a,b)
 
         for  i = 1:total
 
-                f = gain(I+u)
+                f = gain.(I0+u)
 
                u+=-h*u+h/(pi)*w*f*dz
 
@@ -72,5 +72,5 @@ function naive_mf(N,L,I0,u,scale,shift,total,h,A,a,b)
 
 
 
-        return u,w,I,z,N
+        return u,w,I0,z,N
 end

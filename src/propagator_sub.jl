@@ -2,7 +2,7 @@
 #@pyimport matplotlib.pyplot as plt
 
 #
-function propagator_sub(u,w,I,beta,h,skip,Ttotal,L)
+function propagator_sub(u,w,I0,beta,h,skip,Ttotal,L)
 # Compute propagators
 
 #beta = 1
@@ -19,14 +19,14 @@ dz2 =L^2/N/N
 
 # Define nu and nu^2
 
-nu2all=4*(I+u)
+nu2all=4*(I0+u)
 
-# Find positive I + a, suprathreshold region (necessary for bump case)
-Lst = find(nu2all.>0)
+# Find positive I_0 + a, suprathreshold region (necessary for bump case)
+Lst = findall(!iszero, nu2all.>0)
 Nst = length(Lst)
 
 # Find subthreshold region
-Lsub = find(nu2all .<= 0)
+Lsub = findall(!iszero, nu2all .<= 0)
 Nsub = length(Lsub)
 
 print(Nst,",",Nsub,"\n")
@@ -46,7 +46,7 @@ U = zeros(N,N)
 
 rv = zeros(N,N)
 sv = zeros(N,N)
-Dvv = eye(N)/dz
+Dvv = Matrix{Float64}(I, size(rand(N,N)))/dz
 #Dvv = eye(N)
 
 rp = zeros(N,N)
@@ -60,7 +60,7 @@ Cuu2 = zeros(N)
 
 #Construct Backwards Euler update matrix
 
-In = eye(Nst)
+In = Matrix{Float64}(I, size(rand(Nst,Nst)))
 Z = zeros(Nst,Nst)
 
 hp = h/pi;
@@ -94,10 +94,10 @@ A = [[A11 A12 A13]; [A21 A22 A23]; [A31 A32 A33]]
 
 Ainv = inv(A)
 
-Asub = eye(Nsub)/(1+h*beta)
+Asub = Matrix{Float64}(I, size(rand(Nsub, Nsub)))/(1+h*beta)
 print(det(Asub),"\n")
 
-phase = zeros(N)-pi
+phase = zeros(N).-pi
 
 count =0 
 Ntotal = round(Ttotal/h)
@@ -188,7 +188,7 @@ end
            # Use time translational invariance, integrating tau is he same as integrating t (in reverse)
            # use rho(z,pi) = nu/4/pi
 
-          Cuu2 =  sum(U[:,Lst].*U[:,Lst],2)*dz
+          Cuu2 =  sum(U[:,Lst].*U[:,Lst],dims=2)*dz
           Cuu = Cuu1 .- Cuu2
 
 #     print(size(Cuu1)," ",size(Cuu2),"\n")
@@ -209,7 +209,7 @@ end
 # Cuu1 = 2*2\beta \int dz1 dz2 dtau Dvv(z,t;z1,tau) Dvp(z,t;z2,tau) w(z1-z2) rho(z2)
 # Cuu1  *= beta*dz2*h/pi  # need the 1/4/pi factor to convert nu to rho.
 
-Cuu2 =  sum(U[:,Lst].*U[:,Lst],2)*dz
+Cuu2 =  sum(U[:,Lst].*U[:,Lst],dims=2)*dz
 Cuu = Cuu1 .- Cuu2
 
 #return Cout,Cuu,Cuu1,Cuu2,r,U,rv,Dvv,rp,Dvp,Lst,Lsub,nu
