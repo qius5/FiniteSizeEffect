@@ -1,3 +1,4 @@
+push!(LOAD_PATH, "/Users/siweiqiu/FiniteSizeEffect")
 import FiniteSizeEffect
 N=200
 L=1
